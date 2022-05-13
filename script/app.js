@@ -1,7 +1,7 @@
 const file = document.querySelector("#js-audio-input")
 const audio = document.querySelector("#js-audio-source")
 const fileLabel = document.querySelector("#js-audio-label")
-const canva = document.querySelector("#canvas")
+const canvas = document.querySelector("#canvas")
 
 file.addEventListener("change", onFileChange)
 
@@ -37,17 +37,17 @@ function initThree() {
 	scene.add(camera)
 
 	// setup geometry
-	const geometry = new THREE.BufferGeometry()
-	const material = new THREE.MeshBasicMaterial({ color: 0xffffff })
-	const geometryMesh = new THREE.Mesh(geometry, material)
-	scene.add(geometryMesh)
+	const geometry = new THREE.BufferGeometry().setFromPoints(1, 1, 1, 1, 1, 1)
+	const material = new THREE.LineBasicMaterial({ color: 0xffffff })
+	const line = new THREE.Line(geometry, material)
+	scene.add(line)
 
 	// setup ThreeJS renderer
 	const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas })
 	renderer.setPixelRatio(window.devicePixelRatio)
 	renderer.setSize(window.innerWidth, window.innerHeight)
 
-	return { renderer, scene, camera, geometry }
+	return { renderer, scene, camera, geometry, line }
 }
 
 function getVertices(arr) {
@@ -63,27 +63,29 @@ function getVertices(arr) {
 	return vertices
 }
 
-let stop = false
+// todo: remove this line bellow
+// let stop = false
 
 function startNewVisualization() {
 	const { analyser, dataArray } = initContext()
-	const { renderer, scene, camera, geometry } = initThree()
+	const { renderer, scene, camera, line } = initThree()
 
 	audio.play()
 
-	function render(now) {
+	function render() {
+		requestAnimationFrame(render)
 		// setTimeout(() => {
 		// 	if(!stop) requestAnimationFrame(render)
 		// }, 1000)
-		requestAnimationFrame(render)
 
 		analyser.getByteFrequencyData(dataArray, scene)
+
 		const vertices = getVertices(dataArray)
-		geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
+
+		line.geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
 
 		renderer.render(scene, camera)
 	}
-
+	
 	requestAnimationFrame(render)
-
 }
