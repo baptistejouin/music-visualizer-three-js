@@ -19,13 +19,6 @@ body
 	height: 100%
 	z-index: -1
 
-audio
-	// position: fixed
-	// left: 0
-	// bottom: 2rem
-	padding: 0 4rem
-	width: 100%
-
 .container
 	height: 100vh
 
@@ -34,9 +27,12 @@ audio
 	flex-direction: column
 	justify-content: flex-end
 	align-items: center
-	gap: 2rem
+	gap: 1rem
 	padding: 3rem 0
 	height: 100%
+	.songName
+		color: $c2
+		font-weight: normal
 	input
 		display: none
 	label
@@ -44,3 +40,8 @@ audio
 		background: $c1
 		border-radius: 5rem
 		padding: .75rem 2rem
+	audio
+		padding: 0 4rem
+		width: 100%
+		margin-top: .5rem
+		opacity: .4

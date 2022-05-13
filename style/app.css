@@ -19,11 +19,6 @@ body {
   z-index: -1;
 }
 
-audio {
-  padding: 0 4rem;
-  width: 100%;
-}
-
 .container {
   height: 100vh;
 }
@@ -42,9 +37,14 @@ audio {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  gap: 2rem;
+  gap: 1rem;
   padding: 3rem 0;
   height: 100%;
+}
+
+.wrapper .songName {
+  color: #dbdee1;
+  font-weight: normal;
 }
 
 .wrapper input {
@@ -56,5 +56,12 @@ audio {
   background: #282a2b;
   border-radius: 5rem;
   padding: .75rem 2rem;
+}
+
+.wrapper audio {
+  padding: 0 4rem;
+  width: 100%;
+  margin-top: .5rem;
+  opacity: .4;
 }
 /*# sourceMappingURL=app.css.map */

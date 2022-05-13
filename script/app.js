@@ -2,12 +2,14 @@ const file = document.querySelector("#js-audio-input")
 const audio = document.querySelector("#js-audio-source")
 const fileLabel = document.querySelector("#js-audio-label")
 const canvas = document.querySelector("#canvas")
+const songName = document.querySelector('#js-song-name')
 
 file.addEventListener("change", onFileChange)
 
 async function onFileChange(event) {
 	// when a user loads an audio file
 	const file = event.target.files[0]
+	songName.textContent = file.name
 	const fileURL = URL.createObjectURL(file)
 	audio.src = fileURL
 	await audio.load()
@@ -32,7 +34,7 @@ function initThree() {
 	// setup scene & camera
 	const scene = new THREE.Scene()
 	const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 80000)
-	camera.position.set(0, 0, 800)
+	camera.position.set(0, 0, 500)
 	camera.lookAt(scene.position)
 	scene.background = new THREE.Color(0x111111)
 	scene.add(camera)
