@@ -6,6 +6,7 @@ const canvas = document.querySelector("#canvas")
 file.addEventListener("change", onFileChange)
 
 async function onFileChange(event) {
+	// when a user loads an audio file
 	const file = event.target.files[0]
 	const fileURL = URL.createObjectURL(file)
 	audio.src = fileURL
@@ -33,10 +34,10 @@ function initThree() {
 	const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 80000)
 	camera.position.set(0, 0, 800)
 	camera.lookAt(scene.position)
-	scene.background = new THREE.Color(0x000000)
+	scene.background = new THREE.Color(0x111111)
 	scene.add(camera)
 
-	// setup geometry
+	// setup geometry and line
 	const geometry = new THREE.BufferGeometry().setFromPoints(1, 1, 1, 1, 1, 1)
 	const material = new THREE.LineBasicMaterial({ color: 0xffffff })
 	const line = new THREE.Line(geometry, material)
@@ -47,7 +48,10 @@ function initThree() {
 	renderer.setPixelRatio(window.devicePixelRatio)
 	renderer.setSize(window.innerWidth, window.innerHeight)
 
-	return { renderer, scene, camera, geometry, line }
+	// on window resize, update the visualization
+	window.addEventListener("resize", () => onWindowResize(camera, renderer), false)
+
+	return { renderer, scene, camera, line }
 }
 
 function getVertices(arr) {
@@ -63,9 +67,6 @@ function getVertices(arr) {
 	return vertices
 }
 
-// todo: remove this line bellow
-// let stop = false
-
 function startNewVisualization() {
 	const { analyser, dataArray } = initContext()
 	const { renderer, scene, camera, line } = initThree()
@@ -74,18 +75,21 @@ function startNewVisualization() {
 
 	function render() {
 		requestAnimationFrame(render)
-		// setTimeout(() => {
-		// 	if(!stop) requestAnimationFrame(render)
-		// }, 1000)
 
 		analyser.getByteFrequencyData(dataArray, scene)
 
 		const vertices = getVertices(dataArray)
 
-		line.geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3))
+		line.geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3))
 
 		renderer.render(scene, camera)
 	}
-	
+
 	requestAnimationFrame(render)
+}
+
+function onWindowResize(camera, renderer) {
+	camera.aspect = window.innerWidth / window.innerHeight
+	camera.updateProjectionMatrix()
+	renderer.setSize(window.innerWidth, window.innerHeight)
 }
