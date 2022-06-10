@@ -2,32 +2,53 @@ const file = document.querySelector("#js-audio-input")
 const audio = document.querySelector("#js-audio-source")
 const fileLabel = document.querySelector("#js-audio-label")
 const canvas = document.querySelector("#canvas")
-const songName = document.querySelector('#js-song-name')
+const songName = document.querySelector("#js-song-name")
+const btnDefaultSong = document.querySelector("#js-song-set-default")
+const loader = document.querySelector("#js-loader")
+const context = new AudioContext()
+const source = context.createMediaElementSource(audio)
+
+let renderRequestAnimationFrame
 
 file.addEventListener("change", onFileChange)
+btnDefaultSong.addEventListener("click", setDefaultSong)
 
 async function onFileChange(event) {
 	// when a user loads an audio file
-	const file = event.target.files[0]
-	songName.textContent = file.name
-	const fileURL = URL.createObjectURL(file)
-	audio.src = fileURL
+	if(!audio.paused) audio.pause()
+
+	// launched with user's music (from input)
+	if(event) {
+		const file = event.target.files[0]
+		songName.textContent = file.name
+		const fileURL = URL.createObjectURL(file)
+		audio.src = fileURL
+	}
+
+	// loading
+	loader.getElementsByClassName.visibility = 'hidden'
 	await audio.load()
+	loader.getElementsByClassName.visibility = 'visible'
+	
 	startNewVisualization()
 }
 
 function initContext() {
-	// create audiocontext
-	const context = new AudioContext()
-	const source = context.createMediaElementSource(audio)
 	const analyser = context.createAnalyser()
+
+	// reset if a music has been played before
+	source?.disconnect()
+	analyser?.disconnect()
+	if(renderRequestAnimationFrame) cancelAnimationFrame(renderRequestAnimationFrame)
+
 	source.connect(analyser)
 	analyser.connect(context.destination)
 	analyser.fftSize = 512
+
 	const bufferLength = analyser.frequencyBinCount
 	const dataArray = new Uint8Array(bufferLength)
 
-	return { context, analyser, dataArray }
+	return { analyser, dataArray }
 }
 
 function initThree() {
@@ -40,7 +61,7 @@ function initThree() {
 	scene.add(camera)
 
 	// setup geometry and line
-	const geometry = new THREE.BufferGeometry().setFromPoints(1, 1, 1, 1, 1, 1)
+	const geometry = new THREE.BufferGeometry()
 	const material = new THREE.LineBasicMaterial({ color: 0xffffff })
 	const line = new THREE.Line(geometry, material)
 	scene.add(line)
@@ -76,7 +97,7 @@ function startNewVisualization() {
 	audio.play()
 
 	function render() {
-		requestAnimationFrame(render)
+		renderRequestAnimationFrame = requestAnimationFrame(render)
 
 		analyser.getByteFrequencyData(dataArray, scene)
 
@@ -86,12 +107,18 @@ function startNewVisualization() {
 
 		renderer.render(scene, camera)
 	}
-
-	requestAnimationFrame(render)
+	
+	renderRequestAnimationFrame = requestAnimationFrame(render)
 }
 
 function onWindowResize(camera, renderer) {
 	camera.aspect = window.innerWidth / window.innerHeight
 	camera.updateProjectionMatrix()
 	renderer.setSize(window.innerWidth, window.innerHeight)
+}
+
+function setDefaultSong() {
+	audio.setAttribute("src", "./assets/file/beyond.mp3")
+	songName.textContent = "Beyond - Daft Punk"
+	onFileChange()
 }
