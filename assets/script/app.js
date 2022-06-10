@@ -1,3 +1,5 @@
+let context, source, renderRequestAnimationFrame
+
 const file = document.querySelector("#js-audio-input")
 const audio = document.querySelector("#js-audio-source")
 const fileLabel = document.querySelector("#js-audio-label")
@@ -5,18 +7,21 @@ const canvas = document.querySelector("#canvas")
 const songName = document.querySelector("#js-song-name")
 const btnDefaultSong = document.querySelector("#js-song-set-default")
 const loader = document.querySelector("#js-loader")
-const context = new AudioContext()
-const source = context.createMediaElementSource(audio)
-
-let renderRequestAnimationFrame
 
 file.addEventListener("change", onFileChange)
 btnDefaultSong.addEventListener("click", setDefaultSong)
 
-async function onFileChange(event) {
-	// when a user loads an audio file
-	if(!audio.paused) audio.pause()
+function defineNewAudioContext() {
+	// the AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://goo.gl/7K7WLu
+	context = new AudioContext
+	source = context.createMediaElementSource(audio)
+}
 
+// when a user loads an audio file
+async function onFileChange(event) {
+	// reset if a music has been played before
+	if(renderRequestAnimationFrame) cancelAnimationFrame(renderRequestAnimationFrame)
+	
 	// launched with user's music (from input)
 	if(event) {
 		const file = event.target.files[0]
@@ -33,13 +38,10 @@ async function onFileChange(event) {
 	startNewVisualization()
 }
 
-function initContext() {
-	const analyser = context.createAnalyser()
+function initContext() {	
+	if(!context) defineNewAudioContext()
 
-	// reset if a music has been played before
-	source?.disconnect()
-	analyser?.disconnect()
-	if(renderRequestAnimationFrame) cancelAnimationFrame(renderRequestAnimationFrame)
+	const analyser = context.createAnalyser()
 
 	source.connect(analyser)
 	analyser.connect(context.destination)
@@ -106,6 +108,8 @@ function startNewVisualization() {
 		line.geometry.setAttribute("position", new THREE.Float32BufferAttribute(vertices, 3))
 
 		renderer.render(scene, camera)
+
+		console.log('render', renderRequestAnimationFrame);
 	}
 	
 	renderRequestAnimationFrame = requestAnimationFrame(render)
