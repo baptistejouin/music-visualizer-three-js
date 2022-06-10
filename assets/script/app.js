@@ -31,9 +31,9 @@ async function onFileChange(event) {
 	}
 
 	// loading
-	loader.getElementsByClassName.visibility = 'hidden'
-	await audio.load()
 	loader.getElementsByClassName.visibility = 'visible'
+	await audio.load()
+	loader.getElementsByClassName.visibility = 'hidden'
 	
 	startNewVisualization()
 }

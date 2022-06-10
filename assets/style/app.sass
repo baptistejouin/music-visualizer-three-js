@@ -36,6 +36,8 @@ body
 	display: flex
 	flex-direction: row
 	gap: 1rem
+	flex-wrap: wrap
+	justify-content: center
 
 .audio-control
 	.songName
@@ -45,6 +47,7 @@ body
 		display: none
 	.btn
 		font: inherit
+		text-align: center
 		font-size: .9rem
 		color: $c2
 		background: $c1
@@ -55,10 +58,13 @@ body
 		&-secondary
 			background: transparent
 			border: solid 1px $c1
+
+		@media screen and (max-width: 460px)
+			width: calc(100% - 2rem)
+
 	audio
 		transform: scale(.9)
-		padding: 0 4rem
-		width: 100%
+		width: #{"min(100%, 60rem)"}
 		opacity: .4
 
 .loader
@@ -69,7 +75,7 @@ body
 	position: fixed
 	top: 40%
 	left: 50%
-	transform: translate(-50%,0)
+	transform: translate(-50%, 0)
 	font-size: 2rem
 	color: $c2
 	visibility: hidden
